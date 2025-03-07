@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use geo::{coord, LineString, Polygon};
 
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize, Hash, Clone)]
 pub struct SquareID(pub String);
@@ -26,5 +27,17 @@ impl SquareID {
             .parse::<u32>()
             .unwrap();
         (x, y)
+    }
+    pub fn to_polygon(&self, square_size_m: f64) -> Polygon {
+        let (x, y) = self.get_xy_as_f64();
+        let shift = square_size_m / 2.0;
+        let poly = vec![
+            coord! { x: x - shift, y: y - shift },
+            coord! { x: x + shift, y: y - shift },
+            coord! { x: x + shift, y: y + shift },
+            coord! { x: x - shift, y: y + shift },
+            coord! { x: x - shift, y: y - shift },
+        ];
+        Polygon::new(LineString(poly), vec![])
     }
 }
